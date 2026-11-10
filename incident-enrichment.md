@@ -10,7 +10,7 @@ Definition: [`incident-enrichment.yaml`](incident-enrichment.yaml)
 
 ## How it works
 
-Seven blocks in a straight line, no branches.
+Seven blocks in a straight line, no branches. The canvas groups them into four colored stages with a note on each: Trigger (step 1), Gather context (2 and 3), Summarize (4) and Share (5 to 7).
 
 1. **Incident Triggered** emits the PagerDuty incident.
 2. **Fetch GitHub Deploys** calls `GET /repos/YOUR_ORG/<service>/deployments?per_page=5` through the GitHub app. `<service>` is the PagerDuty service name, lowercased, with spaces turned into hyphens. That assumes each repository is named after its PagerDuty service.
