@@ -18,7 +18,7 @@ The three MCP Tool blocks. Copy the server URL from the flow menu ("Copy MCP ser
 
 ## How it works
 
-The canvas has one column per tool.
+The canvas has a gray overview note and one colored backdrop per tool, each with a description note beside it.
 
 ### list_stacks
 
