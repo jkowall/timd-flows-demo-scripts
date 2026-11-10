@@ -27,7 +27,7 @@ Seven blocks in a straight line, no branches.
 | App installations | `anthropic` (Anthropic 0.8.0), `datadog` (Datadog 0.1.2), `github` (GitHub 0.6.0), `pagerduty` (PagerDuty 0.2.0), `slack` (Slack 0.2.2). |
 | Secrets | `PAGERDUTY_FROM_EMAIL`: the email of a PagerDuty user. PagerDuty attributes the incident note to this user. |
 | Placeholders to replace | `PXXXXXX` in Incident Triggered (your PagerDuty service ID) and `YOUR_ORG` in Fetch GitHub Deploys (your GitHub org). |
-| Naming convention | GitHub repositories and Datadog `service:` tags have to match the PagerDuty service name after lowercasing and hyphenating. If they do not, those two calls find nothing for the service. |
+| Naming convention | GitHub repositories and Datadog `service:` tags have to match the PagerDuty service name after lowercasing and hyphenating. If they do not, the two calls fail differently. GitHub answers a repository that doesn't exist with a 404, so Fetch GitHub Deploys errors and nothing after it runs for that incident. A Datadog tag that matches nothing just returns no monitors and the flow carries on. An unreplaced `YOUR_ORG` gets the same 404. |
 | GitHub deployments | Deploys have to be recorded as GitHub Deployments. Commits and releases alone do not show up. |
 | Slack permissions | The Slack app needs permission to create channels. |
 | Spacelift account link | Not needed; this flow has no Spacelift blocks. |
@@ -43,7 +43,7 @@ Seven blocks in a straight line, no branches.
 
 ## Known gaps
 
-Checked 2026-11-09 by importing this YAML into a Flows project. The flow matches this file block for block, and the Errors panel shows only the missing `PAGERDUTY_FROM_EMAIL` secret. The placeholders do not show as errors because they are valid strings, so the flow looks ready before it is.
+Checked 2026-11-09 against a copy of this flow in a Flows project. The flow matches this file block for block, and the Errors panel shows only the missing `PAGERDUTY_FROM_EMAIL` secret. The placeholders do not show as errors because they are valid strings, so the flow looks ready before it is.
 
 - Nobody gets invited to the new incident channel. Responders have to find it and join.
 - Every block waits on the one before it and there is no error handler. If any block errors, nothing after it runs for that incident, including the Slack channel.
