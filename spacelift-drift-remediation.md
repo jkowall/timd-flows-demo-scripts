@@ -56,7 +56,7 @@ The canvas groups the 19 blocks into five colored stages with a note on each. Th
 
 ## Known gaps
 
-Checked 2026-11-09 by importing this YAML into a Flows project and reading the Errors panel. Nothing here changes the flow's logic; it is the list of what to finish.
+Checked 2026-11-09 against a copy of this flow in a Flows project and reading the Errors panel. Nothing here changes the flow's logic; it is the list of what to finish.
 
 **Expressions that point at blocks that do not exist**
 
