@@ -14,7 +14,7 @@ Definition: [`self-service-s3-bucket.yaml`](self-service-s3-bucket.yaml)
 | Database engine | `aurora-postgresql` (default) or `aurora-mysql`. |
 | Database name | Required, default `appdb`. Letters, digits and underscores. |
 | Environment type | `staging` (default), `sandbox` or `ephemeral`. |
-| TTL in minutes | Ephemeral only, 1 to 1440. |
+| TTL in minutes | Required for `ephemeral`, 1 to 1440, even though the form marks it optional. Ignored for the other types. |
 | Justification | Required. |
 
 ## How it works
@@ -33,7 +33,7 @@ Definition: [`self-service-s3-bucket.yaml`](self-service-s3-bucket.yaml)
 
 ### 4. Tear down ephemeral environments
 
-**Is Ephemeral** passes when the environment type is `ephemeral` and the deployment finished. **Wait TTL** sleeps for the requested minutes (2 if none was given). **Delete Deployment** removes the template deployment and its stacks through the Spacelift GraphQL API, and **Notify Teardown** posts that it is gone.
+**Is Ephemeral** passes when the environment type is `ephemeral` and the deployment finished. **Wait TTL** sleeps for the requested minutes. **Delete Deployment** removes the template deployment and its stacks through the Spacelift GraphQL API, and **Notify Teardown** posts that it is gone.
 
 ## What it needs
 
@@ -56,8 +56,9 @@ Definition: [`self-service-s3-bucket.yaml`](self-service-s3-bucket.yaml)
 
 ## Known gaps
 
-Checked 2026-11-09 by importing this YAML into a Flows project. The flow matches this file block for block. The Errors panel shows the three missing secrets and the unlinked Spacelift account, nothing else.
+Checked 2026-11-09 against a copy of this flow in a Flows project. The flow matches this file block for block. The Errors panel shows the three missing secrets and the unlinked Spacelift account, nothing else.
 
 - Anyone in the channel can click Approve at either level, and one person can approve both. The conditions check which button was clicked, not who clicked it.
 - ServiceNow only hears about validation. After `WORK_IN_PROGRESS` the request item is never set to `COMPLETED` on deploy or to `FAILED` on rejection; those outcomes go to Slack only.
+- An `ephemeral` request without a TTL is rejected. The form marks the field optional, but Validate Request treats a missing TTL as 0 and fails it, so the 2-minute fallback in Wait TTL never runs.
 - Validation is stricter than the form text. The database name must also start with a letter and be at most 63 characters, and the project identifier cannot end with a hyphen. A request that breaks only those rules gets a rejection comment that does not explain why.
