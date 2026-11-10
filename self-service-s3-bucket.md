@@ -19,19 +19,21 @@ Definition: [`self-service-s3-bucket.yaml`](self-service-s3-bucket.yaml)
 
 ## How it works
 
-### 1. Validate
+The canvas groups the 15 blocks into four colored stages with a note on each. The same stages, in order:
 
-**Validate Request** checks the project identifier and database name against regexes and, for ephemeral requests, the TTL range. A bad request goes to **Reject Invalid Request**, which marks the ServiceNow request item `FAILED` with a comment listing the rules. A good one goes to **Request Received**, which sets the item to `WORK_IN_PROGRESS` with a comment that it is waiting on team lead approval, and to the first approval.
+### 1. Request & validate
 
-### 2. Approve
+**Validate Request** checks the project identifier and database name against regexes and, for ephemeral requests, the TTL range. A bad request goes to **Reject Invalid Request**, which marks the ServiceNow request item `FAILED` with a comment listing the rules. A good one moves on to stage 2.
 
-**Team Lead Approval** posts the request to Slack with Approve and Reject buttons. **Team Lead Approved** passes only when the clicked button is Approve. On approval, **Budget Owner Approval** posts a second message to the same channel, noting who gave the first approval, and **Budget Owner Approved** checks that click the same way. A Reject at either level goes to **Notify Rejected**, which posts who rejected the request and at which level.
+### 2. Acknowledge & approve
+
+**Request Received** sets the item to `WORK_IN_PROGRESS` with a comment that it is waiting on team lead approval. At the same time, **Team Lead Approval** posts the request to Slack with Approve and Reject buttons. **Team Lead Approved** passes only when the clicked button is Approve. On approval, **Budget Owner Approval** posts a second message to the same channel, noting who gave the first approval, and **Budget Owner Approved** checks that click the same way. A Reject at either level goes to **Notify Rejected**, which posts who rejected the request and at which level.
 
 ### 3. Deploy
 
 **Deploy Environment** deploys the Spacelift template from `SPACELIFT_TEMPLATE_ID` into the space from `SPACELIFT_SPACE`. The deployment is named `<project identifier>-<environment type>`, with the project identifier, engine and database name as template inputs. When it completes, **Notify Deployed** posts the outcome to Slack: the template outputs on success, or the final state if it did not finish.
 
-### 4. Tear down ephemeral environments
+### 4. Ephemeral teardown
 
 **Is Ephemeral** passes when the environment type is `ephemeral` and the deployment finished. **Wait TTL** sleeps for the requested minutes. **Delete Deployment** removes the template deployment and its stacks through the Spacelift GraphQL API, and **Notify Teardown** posts that it is gone.
 
