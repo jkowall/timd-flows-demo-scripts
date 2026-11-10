@@ -1,6 +1,6 @@
 # MCP gate for Spacelift
 
-This flow turns Flows into an MCP server that gives an AI agent three Spacelift tools. Two are read-only and answer right away. The third, `trigger_run`, starts a tracked run only after a person approves it in Slack. Every call, approved or not, lands in an audit table.
+This flow turns Flows into an MCP server that gives an AI agent three Spacelift tools. Two are read-only and answer right away. The third, `trigger_run`, starts a tracked run only after a person approves it in Slack. Each call that completes, approved or rejected, is recorded in an audit table.
 
 Definition: [`ai-agent-mcp-gate-spacelift.yaml`](ai-agent-mcp-gate-spacelift.yaml)
 
@@ -57,7 +57,8 @@ The agent's call stays open until someone clicks a button.
 
 ## Known gaps
 
-Checked 2026-11-09 by importing this YAML into a Flows project. The flow matches this file block for block. The Errors panel shows only the missing `SLACK_PLATFORM_APPROVALS_CHANNEL_ID` secret and the unlinked Spacelift account; every expression resolves.
+Checked 2026-11-09 against a copy of this flow in a Flows project. The flow matches this file block for block. The Errors panel shows only the missing `SLACK_PLATFORM_APPROVALS_CHANNEL_ID` secret and the unlinked Spacelift account; every expression resolves.
 
 - The approval message is never updated after a click. The Slack block emits an event for every interaction, so a second click on Approve sends the request through Check Decision again and starts a second run. For a gate, the message should be updated or the buttons removed once someone decides.
+- The audit table only records calls that get far enough. The read-only tools write their row after the Spacelift query succeeds, and `trigger_run` writes its row after someone clicks a button. A failed query or an approval nobody answers leaves no row, and Log Approved writes before Start Run, so a run that fails to start still shows as approved. Don't treat the table as a complete record of tool calls.
 - The flow has no timeout for approvals. If nobody clicks, the agent's call waits for as long as its MCP client allows.
